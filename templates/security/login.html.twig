@@ -1,0 +1,20 @@
+
+{% extends ["layouts/main_theme.html.twig"] %}
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block body %}
+
+    {% if error %}
+        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+
+    {#% block old_form %}
+        {% include "security/old.login.form.twig" %}
+    {% endblock % #}
+
+{% endblock %}
