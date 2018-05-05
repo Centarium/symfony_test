@@ -16,7 +16,19 @@
     <body>
         <div id="root_top"></div>
         <div id="root_main">
-            {% block body %}{% endblock %}
+            <div id="root_aside" class="col-sm-2">
+
+                {% for item in menu %}
+                    <nav class="navbar navbar-light bg-light">
+                        <a class="navbar-brand {{ item.isCurrentPage() }} "
+                           href="{{ path(item.route) }}">{{ item.name }}</a>
+                    </nav>
+                {% endfor %}
+
+            </div>
+            <div id="root_content" class="col-sm-10">
+                {% block body %}{% endblock %}
+            </div>
         </div>
     </body>
 </html>

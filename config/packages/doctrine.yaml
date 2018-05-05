@@ -21,6 +21,7 @@ doctrine:
                       enum: string
                       set: string
                       price_types: string
+                      money: float
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore

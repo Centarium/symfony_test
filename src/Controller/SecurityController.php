@@ -1,6 +1,6 @@
 <?php
 namespace App\Controller;
-
+use App\Entity\Menu;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\Request;
