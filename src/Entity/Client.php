@@ -32,7 +32,7 @@ class Client
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(name="create_user", referencedColumnName="id",nullable=false)
      */
-    private $responsible_id;
+    private $create_user;
     /**
      * @ORM\Column(type="string", length=60)
      */
@@ -101,25 +101,27 @@ class Client
     /**
      * @param mixed $timestamp
      */
-    public function setTimestamp($timestamp): void
+    public function setTimestamp($timestamp=null): void
     {
+        if(is_null($timestamp)) $timestamp = new \DateTime();
+
         $this->timestamp = $timestamp;
     }
 
     /**
      * @return mixed
      */
-    public function getResponsibleId()
+    public function getCreateUser()
     {
-        return $this->responsible_id;
+        return $this->create_user;
     }
 
     /**
      * @param mixed $responsible_id
      */
-    public function setResponsibleId($responsible_id): void
+    public function setCreateUser($create_user): void
     {
-        $this->responsible_id = $responsible_id;
+        $this->create_user = $create_user;
     }
 
     /**

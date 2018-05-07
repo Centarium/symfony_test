@@ -2,6 +2,7 @@
 // src/Controller/LuckyController.php
 namespace App\Controller;
 
+use App\Entity\Invoice;
 use App\Entity\Menu;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Entity\Product;
@@ -10,21 +11,17 @@ class InvoiceController extends Controller
 {
     public function list()
     {
-        $product = $this->getDoctrine()
-            ->getRepository(Product::class)
-            ->find(1);
+        $invoices = $this->getDoctrine()->getRepository(Invoice::class)
+            ->findAll();
 
         $repo = $this->getDoctrine()
             ->getRepository(Menu::class);
 
         $menu = new Menu($repo);
 
-        $number = mt_rand(0, 100);
-
         return $this->render('invoice/list.html.twig', array(
-            'menu' => $menu->getList(),
-            'product' => $product,
-            'number'         => $number,
+            'invoices'=>$invoices,
+            'menu' => $menu->getList()
         ));
 
         /*return new Response(

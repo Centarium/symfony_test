@@ -158,4 +158,21 @@ class Invoice_Details
     {
         $this->tax_rate = $tax_rate;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getServiceId()
+    {
+        return $this->service_id;
+    }
+
+    /**
+     * @param mixed $service_id
+     */
+    public function setServiceId($service_id)
+    {
+        $this->service_id = $service_id;
+    }
+
 }

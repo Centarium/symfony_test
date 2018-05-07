@@ -162,4 +162,15 @@ class Invoice
 
         return $this;
     }
+
+    /**
+     * @param mixed $timestamp
+     */
+    public function setTimestamp($timestamp=null)
+    {
+        if(is_null($timestamp)) $timestamp = new \DateTime();
+
+        $this->timestamp = $timestamp;
+    }
+
 }
