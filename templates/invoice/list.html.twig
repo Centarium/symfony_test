@@ -2,6 +2,11 @@
 
 {% block body %}
 
-    <div class="end"></div>
+    <div id="end" class="end"></div>
 
 {% endblock %}
+
+        {% block javascripts %}
+            {{ parent() }}
+            <script src="{{ asset('build/jsx/app.js') }}"></script>
+        {% endblock %}

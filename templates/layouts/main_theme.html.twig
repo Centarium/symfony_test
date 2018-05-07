@@ -7,11 +7,6 @@
             <link rel="stylesheet" href="{{ asset('build/css/app.css') }}">
             <link rel="stylesheet" href="{{ asset('build/vendor.css') }}" />
         {% endblock %}
-        {% block javascripts %}
-            <script src="{{ asset('build/manifest.js') }}"></script>
-            <script src="{{ asset('build/vendor.js') }}"></script>
-            <script src="{{ asset('build/js/app.js') }}"></script>
-        {% endblock %}
     </head>
     <body>
         <div id="root_top"></div>
@@ -30,5 +25,12 @@
                 {% block body %}{% endblock %}
             </div>
         </div>
+
+
+        {% block javascripts %}
+            <script src="{{ asset('build/manifest.js') }}"></script>
+            <script src="{{ asset('build/vendor.js') }}"></script>
+            <script src="{{ asset('build/js/app.js') }}"></script>
+        {% endblock %}
     </body>
 </html>
