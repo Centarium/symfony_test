@@ -13,4 +13,3 @@ node_modules
 /var/sessions/*
 !var/sessions/.gitkeep
 /vendor/
-assets

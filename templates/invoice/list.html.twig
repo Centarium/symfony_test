@@ -2,11 +2,22 @@
 
 {% block body %}
 
-    <div id="end" class="end"></div>
+    <div id="pad" class="end"></div>
+
+    <style>
+        #pad a{
+            padding: 5px;
+            color: white;
+            background: black;
+            border-radius: 34%;
+            margin: 10px;
+        }
+    </style>
 
 {% endblock %}
 
         {% block javascripts %}
             {{ parent() }}
-            <script src="{{ asset('build/jsx/app.js') }}"></script>
+            <script src="{{ asset('build/jsx/app.js')~'?v='~'now'|date('Y-m-d H:i:s') }}"></script>
         {% endblock %}
+
