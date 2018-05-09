@@ -1,3 +1,6 @@
+/*
+* Главная концепция всего React - перерендер всего компонента при изменении состояния
+* */
 /*Start region Libraries*/
 import React, {Component} from 'react';
 import classNames from 'classnames';
@@ -32,40 +35,46 @@ class Excel extends Component
         this.setState({data: nextProps.initialData});
     }
 
+
     _fireDataChange(data)
     {
-        this.props.onDataChange(data);
+        //this.props.onDataChange(data);
     }
 
-    _sort(key)
+    _sort(key,e)
     {
-        let data = Array.from(this.state.data);
+        var column = key;
+        let data = this.state.data.slice();
         const descending = this.state.sortby === key && !this.state.descending;
+
         data.sort(function (a,b) {
             return descending
                 ? (a[column] < b[column] ? 1: -1 )
                 : (a[column] > b[column] ? 1: -1 );
         });
+
         this.setState({
             data: data,
             sortby: key,
             descending: descending
         });
+
         this._fireDataChange(data);
     }
 
     _showEditor(e){
         this.setState({edit: {
                 row: parseInt(e.target.dataset.row, 10),
-                key: e.target.dataset.key
+                cell: parseInt(e.target.dataset.cell, 10),
+                column: e.target.dataset.column
             }});
     }
 
     _save(e){
         e.preventDefault();
         const value = this.refs.input.getValue();
-        let data  = Array.from(this.state.data);
-        data[this.state.edit.row][this.state.edit.key] = value;
+        let data  = this.state.data.slice();
+        data[this.state.edit.row][this.state.edit.column] = value;
         this.setState({
             edit: null,
             data: data
@@ -163,23 +172,30 @@ class Excel extends Component
             <thead>
                 <tr>
                     {
-                        this.props.schema.map(item => {
+                        Object.keys(this.props.schema).map((key,idx) =>
+                        {
+                            let item = this.props.schema[key];
+
                             if(!item.show){
                                 return null;
                             }
+
                             let title = item.label;
-                            if( this.state.sortby === item.id ){
+                            if( this.state.sortby === key ){
                                 title += this.state.descending ? '\u2191' : ' \u2193';
                             }
+
                             return (
                                 <th
-                                    className={'schema-${item.id}'}
-                                    key={item.id}
-                                    onClick={this._sort.bind(this, item.id)}>
+                                    className={'schema-${key}'}
+                                    key={key}
+                                    onClick={this._sort.bind(this, key)}>
                                     {title}
                                 </th>
                             )
-                        }, this)
+
+                        }, this )
+
                     }
                     <th className="ExcelNotSortable">Actions</th>
                 </tr>
@@ -198,37 +214,45 @@ class Excel extends Component
         )
     }
 
-    _renderTbodyCell(rowidx, idx, content)
+    _getColumnContent(rowidx, idx, columnId, content)
     {
-        const schema = this.props.schema[idx];
-        let isRating = this._isRating();
+        let columnOptions = this.props.schema[columnId],
+            edit = this.state.edit,
+            isRating = this._isRating(columnOptions)
 
-        return (
-            <td
-                className={classNames({
-                    ['schema-${schema.id}']: true,
-                    'ExcelEditable' : !isRating,
-                    'ExcelDataLeft' : schema.align === 'left',
-                    'ExcelDataRight' : schema.align === 'right',
-                    'ExcelDataCenter' : schema.align !== 'left' && schema.align !== 'right'
-                })}
-                key={idx}
-                data-row={rowidx}
-                data-key={schema.id}
-            >{content}</td>
-        )
-    }
-
-    _getRowContent(idx,rowidx,content)
-    {
-            const schema = this.props.schema[idx];
-            if(!schema || !schema.show){
+            if(!columnOptions || !columnOptions.show){
                 return null;
             }
 
-            content = this._getCellContent(rowidx,idx, content);
 
-            return this._renderTbodyCell(rowidx,idx,content);
+            if(!isRating && edit && edit.row === rowidx && edit.column === columnId && edit.cell === idx )
+            {
+                content = (
+                    <form onSubmit={this._save.bind(this)}>
+                        <FormInput ref="input" {...columnOptions} defaultValue={content}/>
+                    </form>
+                );
+            } else if(isRating)
+            {
+                content = <Rating readonly={true} defaultValue={Number(content)} />
+            }
+
+
+            return (
+                <td
+                    className={classNames({
+                        ['schema-${schema.id}']: true,
+                        'ExcelEditable' : !isRating,
+                        'ExcelDataLeft' : columnOptions.align === 'left',
+                        'ExcelDataRight' : columnOptions.align === 'right',
+                        'ExcelDataCenter' : columnOptions.align !== 'left' && columnOptions.align !== 'right'
+                    })}
+                    key={idx}
+                    data-row={rowidx}
+                    data-cell={idx}
+                    data-column={columnId}
+                >{content}</td>
+            )
     }
 
     _getRowActions(rowidx)
@@ -240,30 +264,9 @@ class Excel extends Component
         )
     }
 
-    _getCellContent(rowidx, idx, content)
+    _isRating(columnOptions)
     {
-        let schema = this._getCellSchema(),
-            edit = this.state.edit,
-            isRating = this._isRating();
-
-        if(!isRating && edit && edit.row === rowidx && edit.key === schema.id)
-        {
-            content = (
-                <form onSubmit={this._save().bind(this)}>
-                    <FormInput ref="input" {...schema} defaultValue={content}/>
-                </form>
-            );
-        } else if(isRating)
-        {
-            content = <Rating readonly={true} defaultValue={Number(content)} />
-        }
-
-        return content;
-    }
-
-    _isRating()
-    {
-        return schema.type === 'rating';
+        return columnOptions.type === 'rating';
     }
 
     _getCellSchema(idx)
@@ -273,23 +276,25 @@ class Excel extends Component
 
     /**
      * Обработка массива данных таблицы
-     * @param value
+     * @param {object} dataItem
      * @param index
      * @returns {*}
      * @private
      */
-    _createRows(value, index)
+    _createRows(dataItem, index)
     {
         return(
             <tr key={index}>
-                {Object.keys(value).map((cell,idx) =>
-                    {
-                        let content = value[cell];
-                        return this._getRowContent(idx,index, content)
-                    }
-                    , this )}
 
-                {this._getRowActions()}
+                {
+                    Object.keys(dataItem).map((key, idx) =>
+                    {
+                        let content = dataItem[key];
+                        return this._getColumnContent(index, idx, key, content)
+                    }, this )
+                }
+
+                {this._getRowActions(index)}
 
             </tr>
         );
@@ -314,67 +319,61 @@ class Excel extends Component
 var headers = localStorage.getItem('headers');
 var data = localStorage.getItem('data');
 if (!headers) {
-    headers = ['Title', 'Year', 'Rating', 'Comments'];
+    headers = {
+        'name' : 'Title',
+        'year' : 'Year',
+        'rating' : 'Rating',
+        'comments' : 'Comments'
+    };
     data = [
         {
             'name': 'Test',
-            'year' : '2015',
+            'year' : 2015,
             'rating' : '3',
             'comments' : 'meh'
+        },
+
+        {
+            'name': 'Tost',
+            'year' : 2014,
+            'rating' : '2',
+            'comments' : 'a'
         }
     ];
 }
 
-var classification = {
-    grapes: [
-        'Baco Noir',
-        'Barbera',
-        'Cabernet Franc',
-        'Cabernet Sauvignon',
-    ]
-};
-
-var schema = [
-    {
-        id: 'name',
+var schema = {
+    name:  {
         label: 'Name',
         show: true, // показать в таблице 'Excel'
         sample: '$2 chuck',
         align: 'left', // выравнивание в 'Excel'
     },
-    {
-        id: 'year',
-            label: 'Year',
+
+    year: {
+        label: 'Year',
         type: 'year',
         show: true,
         sample: 2015,
     },
-    {
-        id: 'grape',
-            label: 'Grape',
-        type: 'suggest',
-        options: classification.grapes,
-        show: true,
-        sample: 'Merlot',
-        align: 'left',
-    },
-    {
-        id: 'rating',
-            label: 'Rating',
+
+    rating :{
+        label: 'Rating',
         type: 'rating',
         show: true,
-        sample: 3,
+        sample: 3
     },
-    {
-        id: 'comments',
-            label: 'Comments',
+
+    comments : {
+        label: 'Comments',
         type: 'text',
         sample: 'Nice for the price',
-    },
-]
+    }
+}
+
 
 Excel.propTypes = {
-    schema: PropTypes.arrayOf(
+    schema: PropTypes.objectOf(
         PropTypes.object
     ),
     initialData: PropTypes.arrayOf(
@@ -395,4 +394,3 @@ ReactDOM.render(
 );
 
 export default Excel
-//module.exports = [Excel, React];
