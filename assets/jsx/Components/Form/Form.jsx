@@ -1,30 +1,29 @@
 import PropTypes from "prop-types";
 import React, {Component} from 'react';
-import './Rating';
+import FormInput from './FormInput';
+import Rating from './Rating';
 
 class Form extends Component {
 
-    getPrefilled(field)
-    {
-        return  this.props.initialData && this.props.initialData[field.id];
-    }
-
     getData(){
         let data={};
-        this.props.fields.forEach(
-            field => data[field.id] = this.refs[field.id].getValue()
-        );
+
+        for(let field in this.props.fields )
+        {
+            data[field] = this.refs[field].getValue()
+        }
         return data;
     }
 
     getFormRowReadonly(field)
     {
-        let prefilled = this.getPrefilled(field);
+        let data = this.props.fields[field],
+            prefilled = this.prefilled;
 
-        return <div className="FormRow" key={field.id}>
-            <span className="FormLabel">{field.label}</span>
+        return <div className="FormRow" key={field}>
+            <span className="FormLabel">{data.label}</span>
             {
-                field.type === 'rating'
+                data.type === 'rating'
                     ? <Rating readonly={true} defaultValue={parseInt(prefilled,10)} />
                     :<div>{prefilled}</div>
             }
@@ -33,38 +32,57 @@ class Form extends Component {
 
     getFormRow(field)
     {
-        let prefilled = this.getPrefilled(field);
+        let data = this.props.fields[field],
+            prefilled = this.prefilled;
 
-        return <div className="FormRow" key={field.id}>
-            <label className="FormLabel" htmlFor={field.id}> {field.label}: </label>
-            <FormInput {...field} ref={field.id} defaultValue={prefilled} />
+        return <div className="FormRow" key={field}>
+            <label className="FormLabel" htmlFor={field}> {data.label}: </label>
+            <FormInput {...data} ref={field} defaultValue={prefilled} />
         </div>;
+    }
+
+    renderForm(form = [])
+    {
+            for (let field in this.props.fields) {
+                this.prefilled = this.props.initialData[field];
+
+                if (!this.props.readonly) {
+                    form.push(this.getFormRow(field));
+                }else if (!this.prefilled) {
+                    return null;
+                } else
+                {
+                    form.push(this.getFormRowReadonly(field));
+                }
+            }
+
+            return form;
     }
 
     render() {
 
         return (
-            <form className="Form">{this.props.fields.map(field=>{
-                let prefilled = this.getPrefilled(field);
-                if(!this.props.readonly)
-                {
-                    return (this.getFormRow(field));
-                };
-                if(!prefilled){
-                    return null;
-                }
-                return (this.getFormRowReadonly(field));
-            }, this)} </form>
+            <form className="Form">{this.renderForm()}</form>
         );
     }
 }
 
+var FieldType = PropTypes.shape({
+    //id: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    type: PropTypes.string,
+    show: PropTypes.bool,
+    sample: PropTypes.any
+    //options: PropTypes.arrayOf(PropTypes.string)
+});
+
+
 Form.propTypes = {
-    fields: PropTypes.arrayOf( PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
-        type: PropTypes.string,
-        options: PropTypes.arrayOf(PropTypes.string)
+    fields: PropTypes.objectOf( PropTypes.shape({
+        name : PropTypes.instanceOf(FieldType),
+        year : PropTypes.instanceOf(FieldType),
+        rating : PropTypes.instanceOf(FieldType),
+        comments : PropTypes.instanceOf(FieldType),
     })).isRequired,
     initialData: PropTypes.object,
     readonly: PropTypes.bool

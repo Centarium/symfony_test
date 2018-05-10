@@ -82,8 +82,15 @@ class Excel extends Component
         this._fireDataChange(data);
     }
 
-    _actionClick(rowidx, action)
+    /**
+     * @param {number} rowidx
+     * @param {object} e
+     * @private
+     */
+    _actionClick(rowidx,e)
     {
+        let action = e.target.dataset.operation;
+
         this.setState({dialog: {type:action,idx: rowidx}});
     }
 
@@ -126,14 +133,14 @@ class Excel extends Component
 
     _renderDeleteDialog(){
         const first = this.state.data[this.state.dialog.idx];
-        const nameguess = first[Object.keys(first)[0]];
+        const nameguess = first.name;
         return (
             <Dialog
                 modal={true}
                 header="Confirm deletion"
                 confirmLabel="Delete"
-                onAction={this._deleteConfirmationClick().bind(this)}>
-                {'Are you sure want to delete "${nameguess}"? '}
+                onAction={this._deleteConfirmationClick.bind(this)}>
+                {'Are you sure want to delete '+nameguess+'? '}
             </Dialog>
         );
     }
