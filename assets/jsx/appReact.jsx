@@ -36,9 +36,9 @@ class Excel extends Component
     }
 
 
-    _fireDataChange(data)
+    _fireDataChange()
     {
-        //this.props.onDataChange(data);
+        console.log('1');
     }
 
     _sort(key,e)
@@ -59,10 +59,13 @@ class Excel extends Component
             descending: descending
         });
 
-        this._fireDataChange(data);
+        this._fireDataChange();
     }
 
     _showEditor(e){
+
+        if(this.state.edit !== null) return;
+
         this.setState({edit: {
                 row: parseInt(e.target.dataset.row, 10),
                 cell: parseInt(e.target.dataset.cell, 10),
@@ -79,7 +82,7 @@ class Excel extends Component
             edit: null,
             data: data
         });
-        this._fireDataChange(data);
+        this._fireDataChange();
     }
 
     /**
@@ -388,6 +391,10 @@ Excel.propTypes = {
     ),
     onDataChange: PropTypes.func
 };
+
+Excel.defaultProps = {
+    onDataChange: () => {},
+}
 
 
 ReactDOM.render(

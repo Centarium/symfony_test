@@ -10,6 +10,12 @@ class FormInput extends Component {
             : this.refs.input.getValue();
 
     }
+
+    _numberEdit(e)
+    {
+        //console.log('1');
+    }
+
     render() {
 
         const common = {
@@ -20,7 +26,9 @@ class FormInput extends Component {
         switch( this.props.type )
         {
             case 'year' : return(
-                <input {...common} type="number" defaultValue={this.props.defaultValue || new Date().getFullYear() } />
+                <input {...common} type="number"
+                       onChange={this._numberEdit.bind(this)}
+                       defaultValue={this.props.defaultValue || new Date().getFullYear() } />
             );
             case 'suggest' :
                 return <Suggest {...common} options={this.props.options} />;
