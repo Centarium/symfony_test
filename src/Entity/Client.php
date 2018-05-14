@@ -42,6 +42,12 @@ class Client
      */
     private $physical_address;
 
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
     /**
      * @return mixed
      */

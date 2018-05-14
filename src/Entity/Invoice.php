@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
  * @ORM\Table(name="invoice")
@@ -134,7 +135,11 @@ class Invoice
      */
     public function getTimeStamp()
     {
-        return $this->timestamp;
+        if( is_null($this->timestamp) || !$this->timestamp instanceof \DateTime )
+        {
+            return '';
+        }
+        return $this->timestamp->format('Y-m-d');
     }
 
     /**

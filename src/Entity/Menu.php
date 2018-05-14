@@ -37,7 +37,7 @@ class Menu
 
     private $menu;
 
-    public function __construct(EntityRepository $menuRepository)
+    final public function __construct(EntityRepository $menuRepository)
     {
         $this->menu = $menuRepository->findAll();
     }

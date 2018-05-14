@@ -44,6 +44,11 @@ class User  implements UserInterface, \Serializable
         $this->username = $username;
     }
 
+    public function __toString()
+    {
+        return $this->getUsername();
+    }
+
     /**
      * @param mixed $password
      */

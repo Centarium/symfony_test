@@ -20,6 +20,7 @@ class InvoiceController extends Controller
         $menu = new Menu($repo);
 
         return $this->render('invoice/list.html.twig', array(
+            'headers' => ['id','client_id','invoice_nr','comment','create_user','timestamp'],
             'invoices'=>$invoices,
             'menu' => $menu->getList()
         ));

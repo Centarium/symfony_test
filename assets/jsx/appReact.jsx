@@ -14,6 +14,7 @@ import Form from './Components/Form/Form';
 import Actions from './Components/ExcelTable/Actions';
 import Dialog from './Components/ExcelTable/Dialog';
 import FormInput from './Components/Form/FormInput';
+import CRUDStore from './Components/ExcelTable/flux/CRUDStore';
 /*End region Components*/
 
 class Excel extends Component
@@ -21,13 +22,26 @@ class Excel extends Component
     constructor(props)
     {
         super(props);
+        {debugger}
+
+        this.storage = new CRUDStore();
+        this.storage.init(schema);
+
         this.state = {
-            data: this.props.initialData,
+            data: this.storage.getData(),
             sortby: null,
             descending: false,
             edit: null,
             dialog: null
         };
+
+        this.schema = this.storage.getSchema();
+       
+        this.storage.addListener('change', () => {
+            this.setState({
+            })
+        });
+
     }
 
     componentWillReceiveProps(nextProps)
@@ -156,7 +170,7 @@ class Excel extends Component
                 confirmLabel={readonly ? 'ok' : 'Save' }
                 hasCancel={!readonly}
                 onAction={this._saveDataDialog.bind(this)}>
-                <Form ref="form" fields={this.props.schema}
+                <Form ref="form" fields={this.schema}
                       initialData={this.state.data[this.state.dialog.idx]}
                       readonly={readonly}/>
             </Dialog>
@@ -182,9 +196,9 @@ class Excel extends Component
             <thead>
                 <tr>
                     {
-                        Object.keys(this.props.schema).map((key,idx) =>
+                        Object.keys(this.storage.getHeaders()).map((key,idx) =>
                         {
-                            let item = this.props.schema[key];
+                            let item = this.schema[key];
 
                             if(!item.show){
                                 return null;
@@ -226,8 +240,9 @@ class Excel extends Component
 
     _getColumnContent(rowidx, idx, columnId, content)
     {
-        let columnOptions = this.props.schema[columnId],
-            edit = this.state.edit,
+        let columnOptions = this.schema[columnId];
+
+        let edit = this.state.edit,
             isRating = this._isRating(columnOptions)
 
             if(!columnOptions || !columnOptions.show){
@@ -281,7 +296,7 @@ class Excel extends Component
 
     _getCellSchema(idx)
     {
-        return this.props.schema[idx];
+        return this.schema[idx];
     }
 
     /**
@@ -311,7 +326,7 @@ class Excel extends Component
     }
 
     render(){
-        {debugger}
+
         return(
             <div className="Excel">
 
@@ -326,34 +341,25 @@ class Excel extends Component
     }
 }
 
-var headers = localStorage.getItem('headers');
-var data = localStorage.getItem('data');
-if (!headers) {
-    headers = {
-        'name' : 'Title',
-        'year' : 'Year',
-        'rating' : 'Rating',
-        'comments' : 'Comments'
-    };
-    data = [
-        {
-            'name': 'Test',
-            'year' : 2015,
-            'rating' : '3',
-            'comments' : 'meh'
-        },
+Excel.propTypes = {
+    schema: PropTypes.objectOf(
+        PropTypes.object
+    ),
+    initialData: PropTypes.arrayOf(
+        PropTypes.object
+    ),
+    onDataChange: PropTypes.func
+};
 
-        {
-            'name': 'Tost',
-            'year' : 2014,
-            'rating' : '2',
-            'comments' : 'a'
-        }
-    ];
+Excel.defaultProps = {
+
+    schema: {},
+    initialData: [{}],
+    onDataChange: () => {},
 }
 
 var schema = {
-    name:  {
+    /*name:  {
         label: 'Name',
         show: true, // показать в таблице 'Excel'
         sample: '$2 chuck',
@@ -374,26 +380,12 @@ var schema = {
         sample: 3
     },
 
-    comments : {
-        label: 'Comments',
-        type: 'text',
-        sample: 'Nice for the price',
-    }
-}
-
-
-Excel.propTypes = {
-    schema: PropTypes.objectOf(
-        PropTypes.object
-    ),
-    initialData: PropTypes.arrayOf(
-        PropTypes.object
-    ),
-    onDataChange: PropTypes.func
-};
-
-Excel.defaultProps = {
-    onDataChange: () => {},
+    invoice_nr : {
+        show : true,
+        label: 'Invoice nr',
+        type: 'input',
+        sample: 'Invoice number',
+    }*/
 }
 
 
@@ -402,7 +394,7 @@ ReactDOM.render(
         <h1>
              Welcome to Excel!
         </h1>
-        <Excel headers={headers} initialData={data} schema={schema} />
+        <Excel />
     </div>,
     document.getElementById('pad')
 );
