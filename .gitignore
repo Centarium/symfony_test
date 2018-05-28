@@ -1,5 +1,13 @@
 .idea
 node_modules
+composer.lock
+package-lock.json
+yarn.lock
+
+public/build/manifest.js
+public/build/manifest.json
+public/build/vendor.css
+public/build/vendor.js
 
 /phpunit.xml
 /var/*
