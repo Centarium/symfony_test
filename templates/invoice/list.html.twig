@@ -1,0 +1,49 @@
+
+
+{% extends ["layouts/main_theme.html.twig"] %}
+
+{% block body %}
+
+    <div id="pad"></div>
+
+    <div id="initialData" class="end hide" >
+        <table>
+            <thead>
+                <tr>
+                    {% for head in headers %}
+                        <th data-id="{{ head }}" >{{ head }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                    <tr>
+                        <td data-id="id">{{ invoice.id }}</td>
+                        <td data-id="client_id">{{ invoice.clientId }}</td>
+                        <td data-id="invoice_nr">{{ invoice.invoiceNr }}</td>
+                        <td data-id="comment">{{ invoice.comment }}</td>
+                        <td data-id="create_user">{{ invoice.createUser }}</td>
+                        <td data-id="timestamp">{{ invoice.timeStamp }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+        #pad a{
+            padding: 5px;
+            color: white;
+            background: black;
+            border-radius: 34%;
+            margin: 10px;
+        }
+    </style>
+
+{% endblock %}
+
+        {% block javascripts %}
+            {{ parent() }}
+            <script src="{{ asset('build/jsx/app.js')~'?v='~'now'|date('Y-m-d H:i:s') }}"></script>
+        {% endblock %}
+

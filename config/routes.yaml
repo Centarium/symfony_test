@@ -1,0 +1,12 @@
+#index:
+#    path: /
+#    defaults: { _controller: 'App\Controller\DefaultController::index' }
+app_services:
+    path: /service/list
+    controller: App\Controller\ServiceController::list
+app_lucky_number:
+    path: /invoice/list
+    controller: App\Controller\InvoiceController::list
+app_clients:
+    path: /client/list
+    controller: App\Controller\ClientController::list

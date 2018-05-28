@@ -1,0 +1,8 @@
+{
+  "build/jsx/app.js": "/build/jsx/app.js",
+  "build/vendor.js": "/build/vendor.js",
+  "build/vendor.css": "/build/vendor.css",
+  "build/js/app.js": "/build/js/app.js",
+  "build/css/app.css": "/build/css/app.css",
+  "build/manifest.js": "/build/manifest.js"
+}
